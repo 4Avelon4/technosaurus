@@ -127,7 +127,7 @@ export default {
         if (!this.emit) {
           const areEqual = deepEqual(this.queryParams, this.$route.query);
 
-          if (areEqual || this.queryParams.page === String(1)) {
+          if (areEqual) {
             return;
           }
         }
