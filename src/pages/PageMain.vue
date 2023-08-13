@@ -32,11 +32,15 @@
 </template>
 
 <script>
+import { API_BASE_URL } from '@/config';
 import ProductList from '@/components/ProductList.vue';
 import BasePagination from '@/components/BasePagination.vue';
 import ProductFilter from '@/components/ProductFilter.vue';
 import ProductInfo from '@/components/ProductInfo.vue';
+import axios from 'axios';
+import { mapMutations } from 'vuex';
 import LoadingInfo from '@/components/LoadingInfo.vue';
+import deepEqual from '@/helpers/deepEqual';
 
 export default {
   data() {
