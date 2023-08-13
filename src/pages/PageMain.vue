@@ -128,6 +128,8 @@ export default {
           const areEqual = deepEqual(this.queryParams, this.$route.query);
 
           if (areEqual || this.queryParams.page === String(1)) {
+            this.loadProducts();
+
             return;
           }
         }
