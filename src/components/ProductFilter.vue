@@ -115,6 +115,7 @@
 <script>
 import { API_BASE_URL } from '@/config';
 import axios from 'axios';
+import validationColors from '@/helpers/validationColors';
 
 export default {
   data() {
@@ -134,7 +135,7 @@ export default {
       return this.categoriesData ? this.categoriesData.items : [];
     },
     colors() {
-      return this.colorsData ? this.colorsData.items : [];
+      return this.colorsData ? this.colorsData.items.filter(validationColors) : [];
     },
   },
   watch: {
