@@ -83,35 +83,6 @@ export default {
         filterParams: this.filterParams,
       });
     },
-    // loadProducts() {
-    //   this.productsData = null;
-
-    //   this.productLoadingChecking(true);
-    //   this.productLoadingFailedChecking(false);
-
-    //   clearTimeout(this.loadProductsTimer);
-
-    //   this.loadProductsTimer = setTimeout(() => {
-    //     axios
-    //       .get(`${API_BASE_URL}/api/products`, {
-    //         params: {
-    //           page: this.filterParams.page,
-    //           limit: this.productsPerPage,
-    //           categoryId: this.filterParams.categoryId,
-    //           colorId: this.filterParams.colorId,
-    //           minPrice: this.filterParams.priceFrom,
-    //           maxPrice: this.filterParams.priceTo,
-    //         },
-    //       })
-    //       .then((response) => (this.productsData = response.data))
-    //       .catch(() => {
-    //         this.productLoadingFailedChecking(true);
-    //       })
-    //       .then(() => {
-    //         this.productLoadingChecking(false);
-    //       });
-    //   }, 0);
-    // },
     toggleQueryParams(value, condition, queryName) {
       if (value !== condition && typeof value !== 'undefined') {
         Reflect.set(this.queryParams, queryName, String(value));
