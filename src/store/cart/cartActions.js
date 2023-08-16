@@ -26,20 +26,30 @@ export default {
     context.commit('cartLoadingChecking', false);
   },
   async addProductToCart(context, { productId, amount }) {
-    const response = await axios.post(
-      `${API_BASE_URL}/api/baskets/products`,
-      {
-        productId,
-        quantity: amount,
-      },
-      {
-        params: {
-          userAccessKey: context.state.userAccessKey,
-        },
-      }
-    );
-    context.commit('updateCartProductsData', response.data.items);
-    context.commit('syncCartProducts');
+    context.commit('productAddedChecking', false);
+    context.commit('productAddSendingChecking', true);
+
+    this.loadProductsTimer = setTimeout(() => {
+      axios
+        .post(
+          `${API_BASE_URL}/api/baskets/products`,
+          {
+            productId,
+            quantity: amount,
+          },
+          {
+            params: {
+              userAccessKey: context.state.userAccessKey,
+            },
+          }
+        )
+        .then((response) => {
+          context.commit('updateCartProductsData', response.data.items);
+          context.commit('syncCartProducts');
+          context.commit('productAddedChecking', true);
+          context.commit('productAddSendingChecking', false);
+        });
+    }, 0);
   },
   updateCartProductAmount(context, { productId, amount }) {
     context.commit('updateCartProductAmount', { productId, amount });

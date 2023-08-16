@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import ProductPreloader from './ProductPreloader.vue';
+import ProductPreloader from '@/components/product/ProductPreloader.vue';
 
 export default {
   props: ['conditionLoading', 'conditionLoadingFailed', 'conditionReset', 'titleLoading', 'titleFailed'],

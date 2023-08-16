@@ -44,9 +44,9 @@ export default {
   props: ['amount'],
   methods: {
     inputCart() {
-      const status = this.amountValue instanceof Number || this.amountValue >= 1;
+      const count = this.amountValue instanceof Number || this.amountValue >= 1;
 
-      if (status) {
+      if (count) {
         this.$emit('update:amount', this.amountValue);
       } else {
         this.amountValue = '';

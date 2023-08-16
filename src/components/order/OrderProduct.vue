@@ -17,8 +17,8 @@
 
 <script>
 import numberFormat from '@/helpers/numberFormat';
-import OrderItem from '@/components/OrderItem.vue';
-import ProductInfo from '@/components/ProductInfo.vue';
+import ProductInfo from '@/components/product/ProductInfo.vue';
+import OrderItem from '@/components/order/OrderItem.vue';
 
 export default {
   filters: { numberFormat },

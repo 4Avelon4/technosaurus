@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import CartCounter from '@/components/CartCounter.vue';
+import CartCounter from '@/components/cart/CartCounter.vue';
 import numberFormat from '@/helpers/numberFormat';
 import { mapActions } from 'vuex';
 

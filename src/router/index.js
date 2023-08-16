@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import PageMain from '@/pages/PageMain.vue';
-import PageProduct from '@/pages/PageProduct.vue';
-import PageCart from '@/pages/PageCart.vue';
-import PageNotFound from '@/pages/PageNotFound.vue';
-import PageOrder from '@/pages/PageOrder.vue';
-import PageOrderInfo from '@/pages/PageOrderInfo.vue';
+import PageMain from '@/components/pages/PageMain.vue';
+import PageProduct from '@/components/pages/PageProduct.vue';
+import PageCart from '@/components/pages/PageCart.vue';
+import PageNotFound from '@/components/pages/PageNotFound.vue';
+import PageOrder from '@/components/pages/PageOrder.vue';
+import PageOrderInfo from '@/components/pages/PageOrderInfo.vue';
 
 Vue.use(VueRouter);
 

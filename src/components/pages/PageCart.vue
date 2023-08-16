@@ -54,10 +54,10 @@
 <script>
 import numberFormat from '@/helpers/numberFormat';
 import { mapGetters, mapActions } from 'vuex';
-import CartItem from '@/components/CartItem.vue';
+import CartItem from '@/components/cart/CartItem.vue';
 import declensionProducts from '@/helpers/declensionProducts';
-import ProductInfo from '@/components/ProductInfo.vue';
-import LoadingInfo from '@/components/LoadingInfo.vue';
+import ProductInfo from '@/components/product/ProductInfo.vue';
+import LoadingInfo from '@/components/common/LoadingInfo.vue';
 
 export default {
   data() {

@@ -10,7 +10,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import ProductPreloader from './ProductPreloader.vue';
+import ProductPreloader from '@/components/product/ProductPreloader.vue';
 
 export default {
   components: { ProductPreloader },

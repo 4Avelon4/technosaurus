@@ -1,10 +1,10 @@
 <template>
   <LoadingInfo
     class="content container"
-    v-if="this.$store.state.product.productsLoading || !productsData"
+    v-if="this.$store.state.product.productsLoading || !this.detailProducts"
     :condition-loading="this.$store.state.product.productsLoading"
-    :condition-loading-failed="!productsData"
-    :condition-reset="loadProduct"
+    :condition-loading-failed="!this.detailProducts"
+    :condition-reset="loading"
     title-loading="Загрузка товара..."
     title-failed="Не удалось загрузить товар"
   />
@@ -153,21 +153,17 @@
 </template>
 
 <script>
-import goToPage from '@/helpers/goToPage';
 import numberFormat from '@/helpers/numberFormat';
-import axios from 'axios';
-import { API_BASE_URL } from '@/config';
-import { mapActions, mapMutations } from 'vuex';
-import CartCounter from '@/components/CartCounter.vue';
-import ProductPreloader from '@/components/ProductPreloader.vue';
-import LoadingInfo from '@/components/LoadingInfo.vue';
+import { mapActions, mapMutations, mapGetters } from 'vuex';
+import CartCounter from '@/components/cart/CartCounter.vue';
+import LoadingInfo from '@/components/common/LoadingInfo.vue';
+import ProductPreloader from '@/components/product/ProductPreloader.vue';
 
 export default {
   components: { CartCounter, ProductPreloader, LoadingInfo },
   data() {
     return {
       amount: +this.$route.query.amount || 1,
-      productsData: null,
       currentCategoryId: 0,
     };
   },
@@ -176,8 +172,10 @@ export default {
     numberFormat,
   },
   computed: {
+    ...mapGetters(['detailProducts']),
+
     product() {
-      const product = this.productsData;
+      const product = this.detailProducts;
 
       return {
         ...product,
@@ -185,45 +183,18 @@ export default {
       };
     },
     category() {
-      return this.productsData.category;
+      return this.detailProducts.category;
     },
   },
   methods: {
-    ...mapActions(['addProductToCart']),
-    ...mapMutations([
-      'productLoadingChecking',
-      'productLoadingFailedChecking',
-      'productAddedChecking',
-      'productAddSendingChecking',
-    ]),
+    ...mapActions(['addProductToCart', 'loadProduct']),
+    ...mapMutations(['productAddedChecking']),
 
-    goToPage,
     addToCart() {
-      this.productAddedChecking(false);
-      this.productAddSendingChecking(true);
-
-      this.loadProductsTimer = setTimeout(() => {
-        this.addProductToCart({ productId: this.product.id, amount: this.amount }).then(() => {
-          this.productAddedChecking(true);
-          this.productAddSendingChecking(false);
-        });
-      }, 0);
+      this.addProductToCart({ productId: this.product.id, amount: this.amount });
     },
-    loadProduct() {
-      this.productLoadingChecking(true);
-      this.productLoadingFailedChecking(false);
-
-      this.loadProductsTimer = setTimeout(() => {
-        axios
-          .get(`${API_BASE_URL}/api/products/${this.$route.params.id}`)
-          .then((response) => (this.productsData = response.data))
-          .catch(() => {
-            this.productLoadingFailedChecking(true);
-          })
-          .then(() => {
-            this.productLoadingChecking(false);
-          });
-      }, 0);
+    loading() {
+      this.loadProduct({ id: this.$route.params.id });
     },
     goToPageCategory() {
       this.$router.push({
@@ -237,7 +208,7 @@ export default {
   watch: {
     '$route.params.id': {
       handler() {
-        this.loadProduct();
+        this.loading();
       },
       immediate: true,
     },

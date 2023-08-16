@@ -100,7 +100,7 @@
 
 <script>
 import { mapActions, mapMutations } from 'vuex';
-import CartIndicator from './components/CartIndicator.vue';
+import CartIndicator from './components/cart/CartIndicator.vue';
 
 export default {
   components: { CartIndicator },

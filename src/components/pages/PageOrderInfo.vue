@@ -69,8 +69,8 @@
 
 <script>
 import { mapActions } from 'vuex';
-import OrderProduct from '@/components/OrderProduct.vue';
-import LoadingInfo from '@/components/LoadingInfo.vue';
+import OrderProduct from '@/components/order/OrderProduct.vue';
+import LoadingInfo from '@/components/common/LoadingInfo.vue';
 
 export default {
   methods: {

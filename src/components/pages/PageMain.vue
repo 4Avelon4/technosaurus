@@ -32,14 +32,12 @@
 </template>
 
 <script>
-import { API_BASE_URL } from '@/config';
-import ProductList from '@/components/ProductList.vue';
-import BasePagination from '@/components/BasePagination.vue';
-import ProductFilter from '@/components/ProductFilter.vue';
-import ProductInfo from '@/components/ProductInfo.vue';
-import axios from 'axios';
-import { mapMutations } from 'vuex';
-import LoadingInfo from '@/components/LoadingInfo.vue';
+import ProductList from '@/components/product/ProductList.vue';
+import BasePagination from '@/components/base/BasePagination.vue';
+import ProductFilter from '@/components/product/ProductFilter.vue';
+import ProductInfo from '@/components/product/ProductInfo.vue';
+import { mapActions, mapGetters } from 'vuex';
+import LoadingInfo from '@/components/common/LoadingInfo.vue';
 import deepEqual from '@/helpers/deepEqual';
 
 export default {
@@ -54,7 +52,6 @@ export default {
       },
 
       productsPerPage: 6,
-      productsData: null,
 
       emit: false,
       queryParams: {},
@@ -63,50 +60,58 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['detailProducts']),
+
     products() {
-      return this.productsData
-        ? this.productsData.items.map((product) => ({
+      return this.detailProducts
+        ? this.detailProducts.items.map((product) => ({
             ...product,
             image: product.image.file.url,
           }))
         : [];
     },
     countProducts() {
-      return this.productsData ? this.productsData.pagination.total : 0;
+      return this.detailProducts ? this.detailProducts.pagination.total : 0;
     },
   },
   methods: {
-    ...mapMutations(['productLoadingChecking', 'productLoadingFailedChecking']),
+    ...mapActions(['loadProducts']),
 
-    loadProducts() {
-      this.productsData = null;
-
-      this.productLoadingChecking(true);
-      this.productLoadingFailedChecking(false);
-
-      clearTimeout(this.loadProductsTimer);
-
-      this.loadProductsTimer = setTimeout(() => {
-        axios
-          .get(`${API_BASE_URL}/api/products`, {
-            params: {
-              page: this.filterParams.page,
-              limit: this.productsPerPage,
-              categoryId: this.filterParams.categoryId,
-              colorId: this.filterParams.colorId,
-              minPrice: this.filterParams.priceFrom,
-              maxPrice: this.filterParams.priceTo,
-            },
-          })
-          .then((response) => (this.productsData = response.data))
-          .catch(() => {
-            this.productLoadingFailedChecking(true);
-          })
-          .then(() => {
-            this.productLoadingChecking(false);
-          });
-      }, 0);
+    loading() {
+      this.loadProducts({
+        productsPerPage: this.productsPerPage,
+        filterParams: this.filterParams,
+      });
     },
+    // loadProducts() {
+    //   this.productsData = null;
+
+    //   this.productLoadingChecking(true);
+    //   this.productLoadingFailedChecking(false);
+
+    //   clearTimeout(this.loadProductsTimer);
+
+    //   this.loadProductsTimer = setTimeout(() => {
+    //     axios
+    //       .get(`${API_BASE_URL}/api/products`, {
+    //         params: {
+    //           page: this.filterParams.page,
+    //           limit: this.productsPerPage,
+    //           categoryId: this.filterParams.categoryId,
+    //           colorId: this.filterParams.colorId,
+    //           minPrice: this.filterParams.priceFrom,
+    //           maxPrice: this.filterParams.priceTo,
+    //         },
+    //       })
+    //       .then((response) => (this.productsData = response.data))
+    //       .catch(() => {
+    //         this.productLoadingFailedChecking(true);
+    //       })
+    //       .then(() => {
+    //         this.productLoadingChecking(false);
+    //       });
+    //   }, 0);
+    // },
     toggleQueryParams(value, condition, queryName) {
       if (value !== condition && typeof value !== 'undefined') {
         Reflect.set(this.queryParams, queryName, String(value));
@@ -128,7 +133,7 @@ export default {
           const areEqual = deepEqual(this.queryParams, this.$route.query);
 
           if (areEqual || this.queryParams.page === String(1)) {
-            this.loadProducts();
+            this.loading();
 
             return;
           }
@@ -155,7 +160,7 @@ export default {
 
         this.filterParamsLoading = true;
 
-        this.loadProducts();
+        this.loading();
 
         this.filterParamsLoading = false;
         this.emit = false;
@@ -178,7 +183,7 @@ export default {
           this.filterParams.colorId = +this.$route.query.colorId || 0;
           this.filterParams.page = +this.$route.query.page || 1;
 
-          this.loadProducts();
+          this.loading();
         }
       },
 
@@ -186,7 +191,7 @@ export default {
     },
   },
   created() {
-    this.loadProducts();
+    this.loading();
   },
   components: { ProductList, BasePagination, ProductFilter, ProductInfo, LoadingInfo },
 };
