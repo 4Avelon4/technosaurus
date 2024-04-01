@@ -125,14 +125,13 @@
 </template>
 
 <script>
-import { API_BASE_URL } from '@/config';
-import axios from 'axios';
 import { mapMutations, mapGetters, mapActions } from 'vuex';
 import BaseFormText from '@/components/base/BaseFormText.vue';
 import BaseFormTextarea from '@/components/base/BaseFormTextarea.vue';
 import ProductInfo from '@/components/product/ProductInfo.vue';
 import OrderProduct from '@/components/order/OrderProduct.vue';
 import LoadingInfo from '@/components/common/LoadingInfo.vue';
+import { orderRequest } from '@/api/order';
 
 export default {
   data() {
@@ -162,32 +161,20 @@ export default {
 
       clearTimeout(this.loadProductsTimer);
 
-      this.loadProductsTimer = setTimeout(() => {
-        axios
-          .post(
-            `${API_BASE_URL}/api/orders`,
-            {
-              ...this.formData,
-            },
-            {
-              params: {
-                userAccessKey: this.$store.state.cart.userAccessKey,
-              },
-            }
-          )
-          .then((response) => {
-            this.resetCart();
-            this.updateOrderInfo(response.data);
-            this.$router.push({ name: 'orderInfo', params: { id: response.data.id } });
-          })
-          .catch((error) => {
-            this.formError = error.response.data.error.request || {};
-            this.formErrorMessage = error.response.data.error.message;
-            this.productLoadingFailedChecking(true);
-          })
-          .then(() => {
-            this.productLoadingChecking(false);
-          });
+      this.loadProductsTimer = setTimeout(async () => {
+        try {
+          const response = await orderRequest(this.$store.state.cart.userAccessKey, this.formData);
+          console.log(this.formData);
+
+          this.resetCart();
+          this.updateOrderInfo(response.data);
+          this.$router.push({ name: 'orderInfo', params: { id: response.data.id } });
+        } catch (error) {
+          this.formError = JSON.parse(JSON.stringify(error.response.data.error.request)) || {};
+          this.formErrorMessage = JSON.parse(JSON.stringify(error.response.data.error.message));
+          this.productLoadingFailedChecking(true);
+        }
+        this.productLoadingChecking(false);
       }, 0);
     },
   },

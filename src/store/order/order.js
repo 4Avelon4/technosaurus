@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { API_BASE_URL } from '@/config';
+import { orderInfoRequest, orderRequest } from '@/api/order';
 
 export default {
   state: {
@@ -18,6 +17,12 @@ export default {
     orderLoadingFailedChecking(state, flag) {
       state.orderLoadingFailed = flag;
     },
+    updateFormError(state, error) {
+      state.formError = error;
+    },
+    updateFormErrorMessage(state, errorMessage) {
+      state.formErrorMessage = errorMessage;
+    },
   },
   actions: {
     async loadOrderInfo(context, orderId) {
@@ -25,11 +30,8 @@ export default {
       context.commit('orderLoadingFailedChecking', false);
       try {
         await new Promise((resolve) => setTimeout(resolve, 0));
-        const response = await axios.get(`${API_BASE_URL}/api/orders/${orderId}`, {
-          params: {
-            userAccessKey: context.rootState.user.userAccessKey,
-          },
-        });
+        const response = await orderInfoRequest(context.rootState.user.userAccessKey, orderId);
+
         context.commit('updateOrderInfo', response.data);
       } catch {
         context.commit('orderLoadingFailedChecking', true);

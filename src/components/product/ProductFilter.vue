@@ -129,7 +129,7 @@ export default {
       colorsData: null,
     };
   },
-  props: ['priceFrom', 'priceTo', 'categoryId', 'colorId', 'page', 'emit'],
+  props: ['priceFrom', 'priceTo', 'categoryId', 'colorId', 'page'],
   computed: {
     categories() {
       return this.categoriesData ? this.categoriesData.items : [];
@@ -159,7 +159,6 @@ export default {
       this.$emit('update:categoryId', this.currentCategoryId);
       this.$emit('update:colorId', this.currentColorId);
       this.$emit('update:page', 1);
-      this.$emit('update:emit', true);
     },
     reset() {
       this.$emit('update:priceFrom', '');
@@ -167,7 +166,6 @@ export default {
       this.$emit('update:categoryId', 0);
       this.$emit('update:colorId', 0);
       this.$emit('update:page', 1);
-      this.$emit('update:emit', true);
     },
     loadDirectory() {
       this.loadProductsTimer = setTimeout(() => {

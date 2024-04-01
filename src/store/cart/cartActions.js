@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { API_BASE_URL } from '@/config';
+import { cartRequest, addProduct, updateCart, removeCart } from '@/api/cart';
 
 export default {
   async loadCart(context) {
@@ -8,11 +7,7 @@ export default {
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 0));
-      const response = await axios.get(`${API_BASE_URL}/api/baskets`, {
-        params: {
-          userAccessKey: context.rootState.user.userAccessKey,
-        },
-      });
+      const response = await cartRequest(context.rootState.user.userAccessKey);
       if (!context.rootState.user.userAccessKey) {
         localStorage.setItem('userAccessKey', response.data.user.accessKey);
         context.commit('updateUserAccessKey', response.data.user.accessKey, { root: true });
@@ -29,29 +24,14 @@ export default {
     context.commit('productAddedChecking', false);
     context.commit('productAddSendingChecking', true);
 
-    this.loadProductsTimer = setTimeout(() => {
-      axios
-        .post(
-          `${API_BASE_URL}/api/baskets/products`,
-          {
-            productId,
-            quantity: amount,
-          },
-          {
-            params: {
-              userAccessKey: context.state.userAccessKey,
-            },
-          }
-        )
-        .then((response) => {
-          context.commit('updateCartProductsData', response.data.items);
-          context.commit('syncCartProducts');
-          context.commit('productAddedChecking', true);
-          context.commit('productAddSendingChecking', false);
-        });
-    }, 0);
+    const response = await addProduct(context.rootState.user.userAccessKey, { productId, amount });
+
+    context.commit('updateCartProductsData', response.data.items);
+    context.commit('syncCartProducts');
+    context.commit('productAddedChecking', true);
+    context.commit('productAddSendingChecking', false);
   },
-  updateCartProductAmount(context, { productId, amount }) {
+  async updateCartProductAmount(context, { productId, amount }) {
     context.commit('updateCartProductAmount', { productId, amount });
 
     if (amount < 1) {
@@ -61,25 +41,14 @@ export default {
     if (typeof amount !== 'number') {
       return;
     }
-    axios
-      .put(
-        `${API_BASE_URL}/api/baskets/products`,
-        {
-          productId,
-          quantity: amount,
-        },
-        {
-          params: {
-            userAccessKey: context.state.userAccessKey,
-          },
-        }
-      )
-      .then((response) => {
-        context.commit('updateCartProductsData', response.data.items);
-      })
-      .catch(() => {
-        context.commit('syncCartProducts');
-      });
+
+    try {
+      const response = await updateCart(context.rootState.user.userAccessKey, { productId, amount });
+
+      context.commit('updateCartProductsData', response.data.items);
+    } catch {
+      context.commit('syncCartProducts');
+    }
   },
   async removeCartFromProduct(context, { productId }) {
     context.commit('cartLoadingChecking', true);
@@ -87,14 +56,9 @@ export default {
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 0));
-      const response = await axios.delete(`${API_BASE_URL}/api/baskets/products`, {
-        data: {
-          productId,
-        },
-        params: {
-          userAccessKey: context.state.userAccessKey,
-        },
-      });
+
+      const response = await removeCart(context.rootState.user.userAccessKey, { productId });
+
       context.commit('updateCartProductsData', response.data.items);
       context.commit('syncCartProducts');
     } catch {

@@ -11,7 +11,6 @@
         :category-id.sync="filterParams.categoryId"
         :color-id.sync="filterParams.colorId"
         :page.sync="filterParams.page"
-        :emit.sync="emit"
       />
 
       <section class="catalog">
@@ -24,7 +23,11 @@
           title-failed="Произошла ошибка при загрузке товаров"
         />
 
-        <ProductList :products="products" v-else-if="!this.$store.state.product.productsLoadingFailed" />
+        <ProductList
+          :products="products"
+          :products-per-page.sync="productsPerPage"
+          v-else-if="!this.$store.state.product.productsLoadingFailed"
+        />
         <BasePagination :page.sync="filterParams.page" :count="countProducts" :per-page="productsPerPage" />
       </section>
     </div>
@@ -53,7 +56,6 @@ export default {
 
       productsPerPage: 6,
 
-      emit: false,
       queryParams: {},
 
       filterParamsLoading: false,
@@ -90,6 +92,10 @@ export default {
     },
   },
   watch: {
+    productsPerPage() {
+      this.filterParams.page = 1;
+      this.loading();
+    },
     filterParams: {
       handler() {
         this.queryParams = {};
@@ -100,23 +106,22 @@ export default {
         this.toggleQueryParams(this.filterParams.categoryId, 0, 'categoryId');
         this.toggleQueryParams(this.filterParams.colorId, 0, 'colorId');
 
-        if (!this.emit) {
-          const areEqual = deepEqual(this.queryParams, this.$route.query);
-
-          if (areEqual || this.queryParams.page === String(1)) {
-            this.loading();
-
-            return;
-          }
-        }
-
         if (Object.keys(this.queryParams).length !== 1 || this.queryParams.page !== String(1)) {
-          this.$router.push({
-            query: {
-              ...this.$route.query,
-              ...this.queryParams,
-            },
-          });
+          this.$router
+            .push({
+              query: {
+                ...this.$route.query,
+                ...this.queryParams,
+              },
+            })
+            .catch((error) => {
+              if (
+                error.name !== 'NavigationDuplicated' &&
+                !error.message.includes('Avoided redundant navigation to current location')
+              ) {
+                console.log(error);
+              }
+            });
         } else if (this.queryParams.page === String(1)) {
           this.queryParams = {};
 
@@ -134,7 +139,6 @@ export default {
         this.loading();
 
         this.filterParamsLoading = false;
-        this.emit = false;
       },
 
       deep: true,

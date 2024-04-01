@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { API_BASE_URL } from '@/config';
+import { productsRequest, productRequest } from '@/api/product';
 
 export default {
   async loadProducts(context, { filterParams, productsPerPage }) {
@@ -8,28 +7,22 @@ export default {
 
     context.commit('resetProductsData');
 
-    this.loadProductsTimer = setTimeout(() => {
-      axios
-        .get(`${API_BASE_URL}/api/products`, {
-          params: {
-            page: filterParams.page,
-            limit: productsPerPage,
-            categoryId: filterParams.categoryId,
-            colorId: filterParams.colorId,
-            minPrice: filterParams.priceFrom,
-            maxPrice: filterParams.priceTo,
-          },
-        })
-        .then((response) => {
-          context.commit('updateProductsData', response.data);
-        })
-        .catch(() => {
-          context.commit('productLoadingFailedChecking', true);
-        })
-        .then(() => {
-          context.commit('productLoadingChecking', false);
-        });
-    }, 0);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const response = await productsRequest(
+        filterParams.page,
+        productsPerPage,
+        filterParams.categoryId,
+        filterParams.colorId,
+        filterParams.priceFrom,
+        filterParams.priceTo
+      );
+
+      context.commit('updateProductsData', response.data);
+    } catch {
+      context.commit('productLoadingFailedChecking', true);
+    }
+    context.commit('productLoadingChecking', false);
   },
   async loadProduct(context, { id }) {
     context.commit('productLoadingChecking', true);
@@ -37,18 +30,14 @@ export default {
 
     context.commit('resetProductsData');
 
-    this.loadProductsTimer = setTimeout(() => {
-      axios
-        .get(`${API_BASE_URL}/api/products/${id}`)
-        .then((response) => {
-          context.commit('updateProductsData', response.data);
-        })
-        .catch(() => {
-          context.commit('productLoadingFailedChecking', true);
-        })
-        .then(() => {
-          context.commit('productLoadingChecking', false);
-        });
-    }, 0);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const response = await productRequest(id);
+
+      context.commit('updateProductsData', response.data);
+    } catch {
+      context.commit('productLoadingFailedChecking', true);
+    }
+    context.commit('productLoadingChecking', false);
   },
 };
